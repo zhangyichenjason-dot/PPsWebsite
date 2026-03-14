@@ -1,0 +1,1925 @@
+---
+---
+
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>PP's Portfolio</title>
+		<style is:global>
+			:root {
+				/* 统一控制所有图片的展示尺寸 —— 修改这里即可一起调整 */
+				--img-width: 100vw;
+				--img-height: 100vh;
+
+				/* hero 视频尺寸和位置 */
+				--video-width: 40vw;
+				--video-top: 50%;
+				--video-left: 52%;
+
+				/* PP动画尺寸和位置 */
+				--pp-width: 95vw;
+				--pp-top: 59%;
+				--pp-left: 37%;
+
+				/* 区段2：关于我 - 手机入场动效控制 */
+				/* 结束状态 (目标位置) */
+				--phone-end-width: 25%;
+				--phone-end-top: 50%;
+				--phone-end-left: 46.5%;
+
+				/* 开始状态 (左下角) */
+				--phone-start-width: 0%;
+				--phone-start-top: 77%;
+				--phone-start-left: 18.5%;
+
+				/* ------------------------------------- */
+				/* 👑 这里是专门控制“对方正在输入...”的参数 */
+				/* ------------------------------------- */
+				/* 1. 垂直位置（距离手机顶部的百分比） */
+				--typing-text-top: 9.3%;
+
+				/* 2. 文字大小 */
+				--typing-text-size: 1.3vw;
+
+				/* 3. 文字颜色 */
+				--typing-text-color: #000;
+
+				/* 4. （微调用）水平方向的细微偏移，默认 -50% 是绝对居中。
+				   如果你觉得偏左或偏右，可以改成 -48% 或 -52% 来微调 */
+				--typing-text-offset-x: -50%;
+
+				/* 5. 小圆点动画的起始位置调整 (如果觉得点点靠上或太靠下) */
+				--typing-dots-margin-left: 2px;
+				--click-hint-x-offset: -8px; /* 所有“点击它”提示的整体水平微调（负值向左，正值向右） */
+				/* ------------------------------------- */
+
+				/* ===== 小动物导航：各自的宽高和间距 ===== */
+				/* 整体位置偏移（负值向左/向上，正值向右/向下） */
+				--animals-nav-x-offset: -35px;
+				--animals-nav-y-offset: -60px;
+				/* 间距（负值 = 重叠） */
+				--animal-spacing: 0px;
+
+				/* 小动物 1 */
+				--animal1-width: 220px;
+				--animal1-height: 220px;
+				--animal1-hint-x-offset: -25px;
+
+				/* 小动物 2 */
+				--animal2-width: 200px;
+				--animal2-height: 200px;
+
+				/* 小动物 3 */
+				--animal3-width: 230px;
+				--animal3-height: 230px;
+				--animal3-y-offset: 10px;
+				--animal3-hint-y-offset: -25px; /* 小动物 3 提示文字的垂直微调 */
+				--animal3-hint-x-offset: -20px; /* 小动物 3 提示文字的水平微调 */
+
+				/* 小动物 4 */
+				--animal4-width: 330px;
+				--animal4-height: 330px;
+				--animal4-x-offset: -30px;
+				--animal4-y-offset: 40px; /* 小动物 4 的垂直微调（正值向下，负值向上） */
+				--animal4-hint-y-offset: 35px; /* 小动物 4 提示文字的垂直微调 */
+				/* ========================================= */
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			html {
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+				background: #000;
+			}
+
+			body {
+				width: 100%;
+				height: 100%;
+				overflow-y: auto;
+				scroll-snap-type: y mandatory;
+				background: #000;
+			}
+
+			/* ========== 公共固定层（各自独立，不包裹在同一容器中） ========== */
+			.shared-layer {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100vw;
+				height: 100vh;
+				pointer-events: none;
+			}
+
+			.shared-layer img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				display: block;
+			}
+
+			.shared-bg {
+				z-index: 1;
+			}
+
+			.shared-fg {
+				z-index: 50;
+			}
+
+			.shared-filter {
+				z-index: 60;
+				mix-blend-mode: multiply;
+			}
+
+			/* ========== 区段通用样式 ========== */
+			.section {
+				position: relative;
+				z-index: 10;
+				width: 100vw;
+				height: 100vh;
+				scroll-snap-align: start;
+				scroll-snap-stop: always;
+			}
+
+			/* ========== 首页区段内容 ========== */
+			.home-content {
+				position: relative;
+				width: 100%;
+				height: 100%;
+			}
+
+			.layer {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: var(--img-width);
+				height: var(--img-height);
+			}
+
+			.layer img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				display: block;
+			}
+
+			.layer-2 {
+				z-index: 3;
+			}
+			.layer-3 {
+				z-index: 4;
+			}
+			.layer-title {
+				z-index: 5;
+			}
+
+			.pp-animation-wrapper {
+				position: fixed;
+				z-index: 15;
+				pointer-events: none;
+				will-change: top, left, width, opacity;
+				transform: translate(-50%, -50%);
+			}
+			.pp-animation-wrapper img {
+				width: 100%;
+				height: auto;
+				display: block;
+			}
+
+			.hero-video-wrapper {
+				position: absolute;
+				top: var(--video-top);
+				left: var(--video-left);
+				transform: translate(-50%, -50%);
+				z-index: 2;
+				width: var(--video-width);
+			}
+
+			.hero-video-wrapper video {
+				width: 100%;
+				height: auto;
+				display: block;
+			}
+
+			/* ========== 其他区段内容样式 ========== */
+			.section-content {
+				position: relative;
+				z-index: 10;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				height: 100%;
+				padding: 4rem;
+				color: #fff;
+			}
+
+			.section-content .content-card {
+				background: rgba(0, 0, 0, 0.55);
+				backdrop-filter: blur(12px);
+				-webkit-backdrop-filter: blur(12px);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				border-radius: 24px;
+				padding: 3rem 4rem;
+				max-width: 700px;
+				width: 100%;
+				text-align: center;
+			}
+
+			.section-content h2 {
+				font-family: "Helvetica Neue", Arial, sans-serif;
+				font-size: 2.5rem;
+				font-weight: 700;
+				margin-bottom: 1.5rem;
+				letter-spacing: 0.05em;
+			}
+
+			.section-content p {
+				font-family: "Helvetica Neue", Arial, sans-serif;
+				font-size: 1.1rem;
+				line-height: 1.8;
+				opacity: 0.85;
+			}
+
+			/* ========== 区段2 手机及打字动画样式 ========== */
+			.phone-container {
+				position: fixed;
+				z-index: 20;
+				pointer-events: none;
+				will-change: top, left, width, opacity;
+				/* JS 会控制 top, left, width, opacity */
+			}
+
+			.phone-container img {
+				width: 100%;
+				height: auto;
+				display: block;
+			}
+
+			/* 手机可见时允许交互 */
+			.phone-container.visible {
+				pointer-events: auto;
+			}
+
+			/* ============================================= */
+			/* “对方正在输入...”及“张润芃PP”的文字外框控制区 */
+			/* ============================================= */
+			.phone-text {
+				position: absolute;
+				/* 读取你在最顶部设置的参数 */
+				top: var(--typing-text-top);
+				left: 50%;
+				transform: translateX(var(--typing-text-offset-x));
+				font-size: var(--typing-text-size);
+				color: var(--typing-text-color);
+
+				font-family: inherit;
+				font-weight: bold;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				white-space: nowrap;
+				transition: opacity 0.3s;
+			}
+
+			.phone-text.hidden {
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			/* 打字动画的小圆点容器 */
+			.typing-dots {
+				display: inline-flex;
+				align-items: flex-end;
+				margin-left: var(--typing-dots-margin-left);
+			}
+
+			/* 单个跳动的小圆点 */
+			.typing-dots span {
+				display: inline-block;
+				animation: bounce 1.4s infinite ease-in-out both;
+			}
+
+			.typing-dots span:nth-child(1) {
+				animation-delay: -0.32s;
+			}
+
+			.typing-dots span:nth-child(2) {
+				animation-delay: -0.16s;
+			}
+
+			@keyframes bounce {
+				0%,
+				80%,
+				100% {
+					transform: translateY(0);
+				}
+				40% {
+					transform: translateY(-5px);
+				}
+			}
+
+			/* ========== 微信聊天界面样式 ========== */
+			.chat-container {
+				position: absolute;
+				top: 15%; /* 调整距离手机顶部的距离，避开刘海/额头 */
+				left: 8%;
+				right: 8%;
+				bottom: 10%; /* 留出底部空间 */
+				overflow-y: auto;
+				overflow-x: hidden;
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+				padding-right: 4px; /* 为滚动条留点空间 */
+
+				/* 初始状态隐藏，等待动画触发 */
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 0.3s;
+			}
+
+			.chat-container.active {
+				opacity: 1;
+				pointer-events: auto;
+			}
+
+			/* 隐藏默认滚动条，自定义细滚动条 */
+			.chat-container::-webkit-scrollbar {
+				width: 4px;
+			}
+			.chat-container::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.chat-container::-webkit-scrollbar-thumb {
+				background: rgba(0, 0, 0, 0.2);
+				border-radius: 4px;
+			}
+
+			.chat-row {
+				display: flex;
+				align-items: flex-start;
+				gap: 10px;
+				opacity: 0;
+				transform: translateY(20px);
+				width: 100%;
+			}
+			.chat-row.left {
+				justify-content: flex-start;
+			}
+			.chat-row.right {
+				justify-content: flex-end;
+			}
+
+			.avatar {
+				width: 35px;
+				height: 35px;
+				background-color: transparent;
+				border-radius: 4px;
+				flex-shrink: 0;
+			}
+			.avatar img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				border-radius: 4px;
+				display: block;
+			}
+
+			.chat-bubble {
+				max-width: 75%;
+				padding: 10px 14px;
+				border-radius: 8px;
+				font-size: 0.9rem; /* 可根据实际手机显示大小微调 */
+				line-height: 1.5;
+				word-break: break-word;
+				position: relative;
+				color: #333;
+			}
+
+			/* 气泡小尾巴通用样式 */
+			.chat-bubble::before {
+				content: "";
+				position: absolute;
+				top: 10px;
+				border-width: 6px;
+			}
+
+			/* 左侧白色气泡（我发的） */
+			.bubble-left {
+				background-color: #fff;
+				border-top-left-radius: 2px;
+			}
+			.bubble-left::before {
+				left: -12px;
+				border-style: solid;
+				border-color: transparent #fff transparent transparent;
+			}
+			.bubble-left::after {
+				display: none;
+			}
+
+			/* 右侧绿色气泡（对方发的） */
+			.bubble-right {
+				background-color: #95ec69; /* 微信绿 */
+				border-top-right-radius: 2px;
+			}
+			.bubble-right::before {
+				right: -12px;
+				border-style: solid;
+				border-color: transparent transparent transparent #95ec69;
+			}
+			.bubble-right::after {
+				display: none;
+			}
+
+			/* 气泡出现动画 */
+			@keyframes slideUpFade {
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			/* 当容器激活时，内的row依次播放动画 */
+			.chat-container.active .chat-row {
+				animation: slideUpFade 0.6s ease-out forwards;
+			}
+
+			/* 延迟设置（加长间隔） */
+			.chat-container.active .chat-row:nth-child(1) {
+				animation-delay: 0.5s;
+			}
+			.chat-container.active .chat-row:nth-child(2) {
+				animation-delay: 1s;
+			}
+			.chat-container.active .chat-row:nth-child(3) {
+				animation-delay: 4s;
+			}
+			.chat-container.active .chat-row:nth-child(4) {
+				animation-delay: 8s;
+			}
+			.chat-container.active .chat-row:nth-child(5) {
+				animation-delay: 12s;
+			}
+			.chat-container.active .chat-row:nth-child(6) {
+				animation-delay: 14s;
+			}
+
+			/* ========== 区段3 作品集相关样式 ========== */
+			.portfolio-container {
+				width: 80%;
+				max-width: 1200px;
+				margin: 0 auto;
+				display: flex;
+				flex-direction: column;
+				gap: 0px;
+				align-items: center;
+				padding-top: 20vh;
+			}
+
+			/* 顶部的小动物导航排 */
+			.animals-nav {
+				display: flex;
+				justify-content: center;
+				align-items: flex-end;
+				position: relative;
+				left: var(--animals-nav-x-offset);
+				top: var(--animals-nav-y-offset);
+			}
+
+			.animal-btn {
+				position: relative;
+				cursor: pointer;
+				transition: transform 0.3s ease;
+				/* 用 margin 控制间距，支持负值重叠 */
+				margin-left: var(--animal-spacing);
+			}
+			/* 第一个不需要左间距 */
+			.animal-btn:first-child {
+				margin-left: 0;
+			}
+			.animal-btn:hover {
+				transform: scale(1.05);
+				z-index: 5;
+			}
+
+			.animal-btn img {
+				object-fit: cover;
+				border-radius: 0; /* 矩形，不裁成圆 */
+				border: none;
+				transition: all 0.3s ease;
+				opacity: 0.4; /* 默认未选中状态变暗 */
+				filter: grayscale(30%);
+				display: block;
+			}
+
+			/* 每只小动物各自的尺寸 */
+			.animal-btn:nth-child(1) img {
+				width: var(--animal1-width);
+				height: var(--animal1-height);
+			}
+			.animal-btn:nth-child(1) .click-hint {
+				--click-hint-x-offset: var(--animal1-hint-x-offset);
+			}
+
+			.animal-btn:nth-child(2) img {
+				width: var(--animal2-width);
+				height: var(--animal2-height);
+			}
+			.animal-btn:nth-child(3) img {
+				width: var(--animal3-width);
+				height: var(--animal3-height);
+			}
+			.animal-btn:nth-child(3) .click-hint {
+				top: var(--animal3-hint-y-offset);
+				--click-hint-x-offset: var(--animal3-hint-x-offset);
+			}
+			.animal-btn:nth-child(3) {
+				top: var(--animal3-y-offset);
+			}
+			.animal-btn:nth-child(4) img {
+				width: var(--animal4-width);
+				height: var(--animal4-height);
+			}
+			.animal-btn:nth-child(4) {
+				left: var(--animal4-x-offset);
+			}
+			.animal-btn:nth-child(4) {
+				top: var(--animal4-y-offset);
+			}
+			.animal-btn:nth-child(4) .click-hint {
+				top: var(--animal4-hint-y-offset);
+			}
+
+			/* 被选中的小动物 */
+			.animal-btn.active img {
+				opacity: 1;
+				filter: grayscale(0%);
+			}
+
+			/* 小动物脚下光 */
+			.animal-glow {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100vw;
+				height: 100vh;
+				pointer-events: none;
+				z-index: 9; /* 在区段内容之下，小动物导航之下 */
+				opacity: 0;
+				visibility: hidden; /* 默认隐藏，由 JS 在进入作品集区段后控制 */
+				transition: opacity 0.4s ease;
+			}
+			.animal-glow img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				display: block;
+			}
+			.animal-glow.active {
+				opacity: 1;
+			}
+
+			/* “点击它”跳动提示 */
+			.click-hint {
+				position: absolute;
+				top: -30px; /* 移到上方 */
+				left: 50%;
+				transform: translateX(calc(-50% + var(--click-hint-x-offset)));
+				color: #f4e6b3;
+				font-size: 0.8rem;
+				font-weight: bold;
+				white-space: nowrap;
+				background: none; /* 移除背景 */
+				padding: 0; /* 移除内边距 */
+				pointer-events: none; /* 防止遮挡点击 */
+				opacity: 0;
+				transition: opacity 0.3s ease;
+				animation: floatHint 1.5s infinite ease-in-out;
+			}
+
+			/* 只有拥有 hint-active 类的按钮才会显示提示 */
+			.animal-btn.hint-active .click-hint {
+				opacity: 1;
+			}
+
+			@keyframes floatHint {
+				0%,
+				100% {
+					transform: translateX(
+							calc(-50% + var(--click-hint-x-offset))
+						)
+						translateY(0);
+				}
+				50% {
+					transform: translateX(
+							calc(-50% + var(--click-hint-x-offset))
+						)
+						translateY(-8px); /* 向上跳动 */
+				}
+			}
+
+			/* 下半部分：左右分栏展示 */
+			.portfolio-content-split {
+				display: flex;
+				width: 100%;
+				background: rgba(255, 255, 255, 0.1);
+				backdrop-filter: blur(10px);
+				border-radius: 20px;
+				padding: 40px;
+				gap: 40px;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				min-height: 480px;
+				align-items: center;
+				transition: opacity 0.3s ease;
+			}
+
+			.portfolio-media {
+				flex: 1;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background: rgba(0, 0, 0, 0.3);
+				border-radius: 12px;
+				padding: 20px;
+				min-height: 300px;
+			}
+			.portfolio-media img,
+			.portfolio-media video {
+				max-width: 100%;
+				max-height: 350px;
+				border-radius: 8px;
+				object-fit: contain;
+			}
+
+			.portfolio-text {
+				flex: 1;
+				color: #fff;
+				display: flex;
+				flex-direction: column;
+				justify-content: flex-start;
+				overflow-y: auto;
+				max-height: 400px;
+			}
+			.portfolio-text h3 {
+				font-size: 1.4rem;
+				margin-bottom: 12px;
+				color: #f0f0f0;
+			}
+			.portfolio-text p {
+				font-size: 0.85rem;
+				line-height: 1.6;
+			}
+
+			/* 彩色能力标签 */
+			.skill-tag {
+				display: inline-block;
+				padding: 3px 10px;
+				border-radius: 20px;
+				font-size: 0.72rem;
+				font-weight: 600;
+				margin: 2px 3px;
+				letter-spacing: 0.03em;
+			}
+			.skill-tag.tag-red {
+				background: rgba(254, 75, 147, 0.29);
+				color: #fb92a0;
+				border: 1px solid rgba(239, 83, 80, 0.324);
+			}
+			.skill-tag.tag-yellow {
+				background: rgba(255, 213, 79, 0.2);
+				color: #ffd54f;
+				border: 1px solid rgba(255, 213, 79, 0.4);
+			}
+			.skill-tag.tag-green {
+				background: rgba(120, 252, 127, 0.168);
+				color: #68fc70bf;
+				border: 1px solid rgba(102, 187, 106, 0.4);
+			}
+
+			.phone-text.hidden {
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			/* ========== BGM 喇叭开关 ========== */
+			.bgm-toggle {
+				position: fixed;
+				bottom: 40px;
+				right: 80px;
+				z-index: 999;
+				width: 60px;
+				height: 60px;
+				border-radius: 10px;
+				border: 1px solid rgba(244, 230, 179, 0.3);
+				background: rgba(0, 0, 0, 0.45);
+				backdrop-filter: blur(8px);
+				-webkit-backdrop-filter: blur(8px);
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: all 0.3s ease;
+				pointer-events: auto;
+				padding: 0;
+			}
+			.bgm-toggle svg {
+				width: 44px;
+				height: 44px;
+			}
+			.bgm-toggle:hover {
+				background: rgba(244, 230, 179, 0.15);
+				transform: scale(1.1);
+			}
+			.bgm-toggle.playing {
+				animation: bgmPulse 2s ease-in-out infinite;
+			}
+			@keyframes bgmPulse {
+				0%,
+				100% {
+					box-shadow: 0 0 0 0 rgba(244, 230, 179, 0.3);
+				}
+				50% {
+					box-shadow: 0 0 12px 4px rgba(244, 230, 179, 0.15);
+				}
+			}
+
+			/* ========== 区段4：联系我样式 ========== */
+			.contact-content {
+				position: relative;
+				z-index: 10;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				height: 100%;
+				padding: 3rem 2rem;
+				gap: 1.5rem;
+			}
+
+			.contact-title {
+				color: #f4e6b3;
+				font-family: "Helvetica Neue", Arial, sans-serif;
+				font-size: 2.4rem;
+				font-weight: 700;
+				letter-spacing: 0.08em;
+				text-shadow: 0 0 20px rgba(244, 230, 179, 0.3);
+			}
+
+			.contact-intro {
+				color: #f4e6b3;
+				font-family: "Helvetica Neue", Arial, sans-serif;
+				font-size: 1.05rem;
+				line-height: 1.9;
+				text-align: center;
+				max-width: 600px;
+				opacity: 0.9;
+			}
+
+			/* 联系方式卡片组 */
+			.contact-cards {
+				display: flex;
+				gap: 24px;
+				flex-wrap: wrap;
+				justify-content: center;
+			}
+
+			.contact-item {
+				position: relative;
+				background: rgba(244, 230, 179, 0.08);
+				backdrop-filter: blur(14px);
+				-webkit-backdrop-filter: blur(14px);
+				border: 1px solid rgba(244, 230, 179, 0.2);
+				border-radius: 16px;
+				padding: 1.5rem 2rem;
+				min-width: 220px;
+				text-align: center;
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+			}
+
+			.contact-item:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 8px 32px rgba(244, 230, 179, 0.15);
+			}
+
+			.contact-icon {
+				font-size: 2rem;
+				margin-bottom: 8px;
+			}
+
+			.contact-label {
+				color: #f4e6b3;
+				font-size: 0.85rem;
+				opacity: 0.7;
+				margin-bottom: 4px;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+			}
+
+			.contact-value {
+				color: #f4e6b3;
+				font-size: 0.95rem;
+				font-weight: 600;
+				margin-bottom: 12px;
+				word-break: break-all;
+			}
+
+			.copy-btn {
+				background: rgba(244, 230, 179, 0.15);
+				color: #f4e6b3;
+				border: 1px solid rgba(244, 230, 179, 0.3);
+				border-radius: 8px;
+				padding: 6px 16px;
+				font-size: 0.85rem;
+				cursor: pointer;
+				transition: all 0.25s ease;
+				pointer-events: auto;
+			}
+
+			.copy-btn:hover {
+				background: rgba(244, 230, 179, 0.3);
+				box-shadow: 0 0 12px rgba(244, 230, 179, 0.2);
+			}
+
+			.copy-btn:active {
+				transform: scale(0.95);
+			}
+
+			.copy-toast {
+				position: absolute;
+				bottom: -28px;
+				left: 50%;
+				transform: translateX(-50%);
+				color: #a8e6a3;
+				font-size: 0.8rem;
+				opacity: 0;
+				transition: opacity 0.3s ease;
+				white-space: nowrap;
+			}
+
+			.copy-toast.show {
+				opacity: 1;
+			}
+
+			/* PDF 下载按钮 */
+			.download-btn {
+				display: inline-block;
+				color: #f4e6b3;
+				background: rgba(244, 230, 179, 0.1);
+				border: 1px solid rgba(244, 230, 179, 0.35);
+				border-radius: 12px;
+				padding: 14px 32px;
+				font-size: 1rem;
+				font-weight: 600;
+				text-decoration: none;
+				transition: all 0.3s ease;
+				pointer-events: auto;
+				letter-spacing: 0.03em;
+			}
+
+			.download-btn:hover {
+				background: rgba(244, 230, 179, 0.25);
+				box-shadow: 0 0 24px rgba(244, 230, 179, 0.2);
+				transform: translateY(-2px);
+			}
+
+			/* 底部署名 */
+			.contact-footer {
+				text-align: center;
+				margin-top: 0.5rem;
+			}
+
+			.footer-credit {
+				color: #f4e6b3;
+				font-size: 0.85rem;
+				opacity: 0.6;
+				margin-bottom: 4px;
+			}
+
+			.footer-thanks {
+				color: #f4e6b3;
+				font-size: 0.9rem;
+				opacity: 0.8;
+				font-style: italic;
+			}
+
+			/* ===== 音符和星星装饰动画 ===== */
+			.contact-decorations {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				pointer-events: none;
+				z-index: 5;
+				overflow: hidden;
+			}
+
+			.deco {
+				position: absolute;
+				color: #f4e6b3;
+				opacity: 0;
+				animation: decoFloat 6s ease-in-out infinite;
+			}
+
+			.deco-note {
+				font-size: 1.4rem;
+			}
+			.deco-star {
+				font-size: 1rem;
+			}
+
+			/* 12个装饰元素各自的位置和动画延迟 */
+			.deco-1 {
+				top: 12%;
+				left: 20%;
+				animation-delay: 0s;
+				animation-duration: 5s;
+			}
+			.deco-2 {
+				top: 15%;
+				left: 78%;
+				animation-delay: 0.8s;
+				animation-duration: 7s;
+			}
+			.deco-3 {
+				top: 28%;
+				left: 22%;
+				animation-delay: 1.5s;
+				animation-duration: 6s;
+			}
+			.deco-4 {
+				top: 32%;
+				left: 75%;
+				animation-delay: 2.2s;
+				animation-duration: 5.5s;
+			}
+			.deco-5 {
+				top: 48%;
+				left: 18%;
+				animation-delay: 0.5s;
+				animation-duration: 6.5s;
+			}
+			.deco-6 {
+				top: 55%;
+				left: 82%;
+				animation-delay: 1.8s;
+				animation-duration: 5s;
+			}
+			.deco-7 {
+				top: 68%;
+				left: 20%;
+				animation-delay: 3s;
+				animation-duration: 7s;
+			}
+			.deco-8 {
+				top: 72%;
+				left: 80%;
+				animation-delay: 0.3s;
+				animation-duration: 6s;
+			}
+			.deco-9 {
+				top: 10%;
+				left: 50%;
+				animation-delay: 2.5s;
+				animation-duration: 5.5s;
+			}
+			.deco-10 {
+				top: 82%;
+				left: 48%;
+				animation-delay: 1.2s;
+				animation-duration: 6s;
+			}
+			.deco-11 {
+				top: 42%;
+				left: 45%;
+				animation-delay: 3.5s;
+				animation-duration: 7s;
+			}
+			.deco-12 {
+				top: 85%;
+				left: 30%;
+				animation-delay: 2s;
+				animation-duration: 5.5s;
+			}
+
+			@keyframes decoFloat {
+				0% {
+					opacity: 0;
+					transform: translateY(0) rotate(0deg);
+				}
+				20% {
+					opacity: 0.5;
+				}
+				50% {
+					opacity: 0.3;
+					transform: translateY(-18px) rotate(15deg);
+				}
+				80% {
+					opacity: 0.5;
+				}
+				100% {
+					opacity: 0;
+					transform: translateY(0) rotate(0deg);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<!-- ===== 公共固定层（各自独立） ===== -->
+		<!-- 背景（最底层，z-index: 1） -->
+		<div class="shared-layer shared-bg">
+			<img src="/images/1.背景.PNG" alt="背景" />
+		</div>
+		<!-- 前景（z-index: 50，在区段内容之上） -->
+		<div class="shared-layer shared-fg">
+			<img src="/images/4.前景.PNG" alt="前景" />
+		</div>
+		<!-- 滤镜（最顶层，z-index: 60） -->
+		<div class="shared-layer shared-filter">
+			<img src="/images/5.滤镜.PNG" alt="滤镜" />
+		</div>
+
+		<!-- PP动画（fixed，JS 控制位置和大小） -->
+		<div class="pp-animation-wrapper" id="pp-anim">
+			<img src="/images/PP动画.webp" alt="PP动画" />
+		</div>
+
+		<!-- ===== 区段1：首页 ===== -->
+		<section class="section" id="home">
+			<div class="home-content">
+				<!-- Hero 视频 -->
+				<div class="hero-video-wrapper">
+					<video autoplay loop muted playsinline>
+						<source
+							src="/images/hero-video.webm"
+							type="video/webm"
+						/>
+					</video>
+				</div>
+
+				<!-- 中景-靠近背景 -->
+				<div class="layer layer-2">
+					<img
+						src="/images/2.中景-靠近背景.PNG"
+						alt="中景-靠近背景"
+					/>
+				</div>
+
+				<!-- 中景-靠近前景 -->
+				<div class="layer layer-3">
+					<img
+						src="/images/3.中景-靠近前景.PNG"
+						alt="中景-靠近前景"
+					/>
+				</div>
+
+				<!-- 主页标题（最上层） -->
+				<div class="layer layer-title">
+					<img src="/images/主页标题.webp" alt="主页标题" />
+				</div>
+			</div>
+		</section>
+
+		<!-- 手机动画（fixed，JS 控制位置和大小） -->
+		<div class="phone-container" id="phone-anim">
+			<img src="/images/手机.PNG" alt="手机" />
+
+			<!-- 对方正在输入提示 -->
+			<div class="phone-text" id="typing-indicator">
+				对方正在输入<span class="typing-dots"
+					><span>.</span><span>.</span><span>.</span>
+				</span>
+			</div>
+
+			<!-- 聊天记录容器 -->
+			<div class="chat-container" id="chat-box">
+				<div class="chat-row left">
+					<div class="avatar">
+						<img src="/images/PP微信头像.PNG" alt="头像" />
+					</div>
+					<div class="chat-bubble bubble-left">
+						您好，我是张润芃PP。
+					</div>
+				</div>
+				<div class="chat-row left">
+					<div class="avatar">
+						<img src="/images/PP微信头像.PNG" alt="头像" />
+					</div>
+					<div class="chat-bubble bubble-left">
+						这是我的基本情况，请您查收~<br /><br />
+						<b>艺术、企业与发展 硕士[在读]</b>
+						<br />英国华威大学[QS69]<br /><br />
+						<b>金融学 双学士</b>
+						<br />北京工业大学[211]<br />
+						爱尔兰都柏林大学[交换]
+					</div>
+				</div>
+				<div class="chat-row left">
+					<div class="avatar">
+						<img src="/images/PP微信头像.PNG" alt="头像" />
+					</div>
+					<div class="chat-bubble bubble-left">
+						我在乐团拥有 14
+						年的打击乐背景🥁，音乐对我而言不仅是长久的热爱，更是一种专业的本能。这种底色让我对音乐和演艺项目有着天然的敏锐度。
+					</div>
+				</div>
+				<div class="chat-row left">
+					<div class="avatar">
+						<img src="/images/PP微信头像.PNG" alt="头像" />
+					</div>
+					<div class="chat-bubble bubble-left">
+						我热衷于探索“不一样”的创意边界，更追求将感性的创意落地为硬核的执行方案。我不满足于常规的完成，而是致力于让每一个策划都具备独特的叙事深度。
+					</div>
+				</div>
+				<div class="chat-row right">
+					<div class="chat-bubble bubble-right">
+						很有意思，想看看你的作品？
+					</div>
+				</div>
+				<div class="chat-row left">
+					<div class="avatar">
+						<img src="/images/PP微信头像.PNG" alt="头像" />
+					</div>
+					<div class="chat-bubble bubble-left">
+						没问题，都在下一页啦👇🏻
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- ===== 区段2：关于我 ===== -->
+		<section class="section" id="about">
+			<div class="section-content" style="padding:0;">
+				<img
+					src="/images/关于我.webp"
+					alt="关于我"
+					style="width:100%;height:100%;object-fit:cover;display:block;"
+				/>
+			</div>
+		</section>
+
+		<!-- 小动物脚下光（fixed 定位，整体网页层面显示） -->
+		<div class="animal-glow" id="glow-1">
+			<img src="/images/小动物1脚下光.PNG" alt="脚下光1" />
+		</div>
+		<div class="animal-glow" id="glow-2">
+			<img src="/images/小动物2脚下光.PNG" alt="脚下光2" />
+		</div>
+		<div class="animal-glow" id="glow-3">
+			<img src="/images/小动物3脚下光.PNG" alt="脚下光3" />
+		</div>
+		<div class="animal-glow active" id="glow-4">
+			<img src="/images/小动物4脚下光.PNG" alt="脚下光4" />
+		</div>
+
+		<!-- ===== 区段3：作品集 ===== -->
+		<section class="section" id="portfolio">
+			<div class="section-content portfolio-container">
+				<!-- 顶部（现改为内容展示区）：详细内容展示区 -->
+				<div class="portfolio-content-split" id="portfolio-display">
+					<!-- 左侧媒体 (图片/视频) -->
+					<div class="portfolio-media" id="portfolio-media-container">
+						<img
+							id="portfolio-img"
+							src=""
+							alt="作品预览"
+							style="display: none;"
+						/>
+						<video
+							id="portfolio-vid"
+							src=""
+							controls
+							loop
+							playsinline
+							style="display: none;"></video>
+					</div>
+					<!-- 右侧文字描述 -->
+					<div class="portfolio-text">
+						<h3 id="portfolio-title">请选择一个小动物</h3>
+						<p id="portfolio-desc">
+							点击下方的小动物头像，查看对应的作品详情与描述。
+						</p>
+					</div>
+				</div>
+
+				<!-- 底部：4只小动物导航 -->
+				<div class="animals-nav" id="animals-nav">
+					<!-- 小动物们由 JS 动态生成/绑定控制 -->
+					<div class="animal-btn" data-index="0">
+						<img src="/images/小动物1.PNG" alt="小动物 1" />
+						<div class="click-hint">⇣ 点击它</div>
+					</div>
+					<div class="animal-btn" data-index="1">
+						<img src="/images/小动物2.PNG" alt="小动物 2" />
+						<div class="click-hint">⇣ 点击它</div>
+					</div>
+					<div class="animal-btn" data-index="2">
+						<img src="/images/小动物3.PNG" alt="小动物 3" />
+						<div class="click-hint">⇣ 点击它</div>
+					</div>
+					<div class="animal-btn active" data-index="3">
+						<img src="/images/小动物4.PNG" alt="小动物 4" />
+						<div class="click-hint">⇣ 点击它</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ===== 区段4：联系我 ===== -->
+		<section class="section" id="contact">
+			<!-- 小音符和小星星装饰 -->
+			<div class="contact-decorations" aria-hidden="true">
+				<span class="deco deco-note deco-1">♪</span>
+				<span class="deco deco-star deco-2">✦</span>
+				<span class="deco deco-note deco-3">♫</span>
+				<span class="deco deco-star deco-4">✧</span>
+				<span class="deco deco-note deco-5">♩</span>
+				<span class="deco deco-star deco-6">✦</span>
+				<span class="deco deco-note deco-7">♬</span>
+				<span class="deco deco-star deco-8">✧</span>
+				<span class="deco deco-note deco-9">♪</span>
+				<span class="deco deco-star deco-10">✦</span>
+				<span class="deco deco-note deco-11">♫</span>
+				<span class="deco deco-star deco-12">✧</span>
+			</div>
+
+			<div class="section-content contact-content">
+				<!-- 标题 -->
+				<h2 class="contact-title">演出谢幕：余音待续</h2>
+
+				<!-- 引言 -->
+				<p class="contact-intro">
+					在这个需要被抚慰的时代，我始终愿意做一个"创造并传递美好"的人。<br
+					/>
+					如果您也在寻找一位感性与逻辑并存的合作者，欢迎后台联络。
+				</p>
+
+				<!-- 联系方式 -->
+				<div class="contact-cards">
+					<!-- 微信 -->
+					<div class="contact-item" id="contact-wechat">
+						<div class="contact-icon">💬</div>
+						<div class="contact-label">微信</div>
+						<div class="contact-value">PPercussionist1347</div>
+						<button class="copy-btn" data-copy="PPercussionist1347">
+							📋 一键复制
+						</button>
+						<span class="copy-toast">已复制 ✓</span>
+					</div>
+
+					<!-- 电话 -->
+					<div class="contact-item" id="contact-phone">
+						<div class="contact-icon">📞</div>
+						<div class="contact-label">电话</div>
+						<div class="contact-value">13071143004</div>
+						<button class="copy-btn" data-copy="13071143004">
+							📋 一键复制
+						</button>
+						<span class="copy-toast">已复制 ✓</span>
+					</div>
+
+					<!-- 邮箱 -->
+					<div class="contact-item" id="contact-email">
+						<div class="contact-icon">✉️</div>
+						<div class="contact-label">邮箱</div>
+						<div class="contact-value">
+							runpeng.zhang@warwick.ac.uk
+						</div>
+						<button
+							class="copy-btn"
+							data-copy="runpeng.zhang@warwick.ac.uk"
+						>
+							📋 一键复制
+						</button>
+						<span class="copy-toast">已复制 ✓</span>
+					</div>
+				</div>
+
+				<!-- PDF 下载 -->
+				<a
+					class="download-btn"
+					href="/images/张润芃作品集.pdf"
+					download="张润芃作品集.pdf"
+				>
+					📥 点击下载：带走我的作品集PDF版
+				</a>
+
+				<!-- 底部署名 -->
+				<div class="contact-footer">
+					<p class="footer-credit">
+						本网站由张润芃设计：每一帧都是手绘哦 🎨
+					</p>
+					<p class="footer-thanks">
+						特别鸣谢：屏幕前耐心读到这里的您 💛
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- BGM 音频 + 喇叭开关 -->
+		<audio id="bgm-audio" src="/images/BGM.opus" loop preload="auto"
+		></audio>
+		<button class="bgm-toggle" id="bgm-toggle" title="切换背景音乐"
+			><svg
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="#f4e6b3"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"
+				></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line
+					x1="17"
+					y1="9"
+					x2="23"
+					y2="15"></line>
+			</svg>
+		</button>
+
+		<script>
+			// PP动画在首页和关于我之间的滚动插值
+			const ppEl = document.getElementById("pp-anim") as HTMLElement;
+			const scrollContainer = document.body;
+
+			// 首页状态（CSS 变量的初始值，单位为 vh/vw 百分比）
+			const startTop = 59; // vh 百分比
+			const startLeft = 37; // vw 百分比
+			const startWidth = 95; // vw 百分比
+
+			// 关于我页面的目标状态（根据需要调整）用于调整PP动画位置和大小
+			const endTop = 48; // vh 百分比
+			const endLeft = 45; // vw 百分比
+			const endWidth = 130; // vw 百分比
+
+			function lerp(a: number, b: number, t: number): number {
+				return a + (b - a) * t;
+			}
+
+			function updatePP() {
+				const scrollTop = scrollContainer.scrollTop;
+				const vh = window.innerHeight;
+
+				// t: 从首页到关于我的滚动进度 (0 ~ 1)
+				// scrollTop = 0 时在首页，scrollTop = vh 时完全到达关于我
+				const t = Math.max(0, Math.min(1, scrollTop / vh));
+
+				// 超过第2页（scrollTop > 2 * vh）则淡出隐藏
+				const fadeStart = 1.0; // 从关于我页底部开始淡出
+				const fadeEnd = 1.5; // 到作品集页中间完全消失
+				const fadeT = scrollTop / vh;
+				let opacity = 1;
+				if (fadeT > fadeStart) {
+					opacity = Math.max(
+						0,
+						1 - (fadeT - fadeStart) / (fadeEnd - fadeStart)
+					);
+				}
+
+				// 插值计算当前值
+				const curTop = lerp(startTop, endTop, t);
+				const curLeft = lerp(startLeft, endLeft, t);
+				const curWidth = lerp(startWidth, endWidth, t);
+
+				ppEl.style.top = curTop + "vh";
+				ppEl.style.left = curLeft + "vw";
+				ppEl.style.width = curWidth + "vw";
+				ppEl.style.opacity = String(opacity);
+				ppEl.style.display = opacity <= 0 ? "none" : "block";
+			}
+
+			// ===== 区段2 手机入场动画 =====
+			const phoneEl = document.querySelector(
+				".phone-container"
+			) as HTMLElement;
+
+			// 获取 CSS 变量的辅助函数
+			function getV(name: string): number {
+				const val = getComputedStyle(document.documentElement)
+					.getPropertyValue(name)
+					.trim();
+				return parseFloat(val);
+			}
+
+			function updatePhone() {
+				const scrollTop = scrollContainer.scrollTop;
+				const vh = window.innerHeight;
+
+				// 实时从 CSS 读取最新值
+				const sW = getV("--phone-start-width");
+				const sT = getV("--phone-start-top");
+				const sL = getV("--phone-start-left");
+
+				const eW = getV("--phone-end-width");
+				const eT = getV("--phone-end-top");
+				const eL = getV("--phone-end-left");
+
+				// t: 从首页到关于我的滚动进度 (0 ~ 1)
+				const t = Math.max(0, Math.min(1, scrollTop / vh));
+
+				// 手机在关于我页面完全可见 (t=1)，继续滚动到第3页时淡出
+				const fadeStart = 1.0;
+				const fadeEnd = 1.5;
+				const fadeT = scrollTop / vh;
+				let phoneOpacity = t;
+				if (fadeT > fadeStart) {
+					phoneOpacity = Math.max(
+						0,
+						1 - (fadeT - fadeStart) / (fadeEnd - fadeStart)
+					);
+				}
+
+				// 插值计算当前值
+				const curPhoneTop = lerp(sT, eT, t);
+				const curPhoneLeft = lerp(sL, eL, t);
+				const curPhoneWidth = lerp(sW, eW, t);
+
+				// 使用 % 重新赋值
+				phoneEl.style.top = curPhoneTop + "%";
+				phoneEl.style.left = curPhoneLeft + "%";
+				phoneEl.style.width = curPhoneWidth + "%";
+				phoneEl.style.transform = "translateY(-50%)";
+				phoneEl.style.opacity = String(phoneOpacity);
+
+				if (phoneOpacity <= 0) {
+					phoneEl.style.display = "none";
+					phoneEl.classList.remove("visible");
+				} else {
+					phoneEl.style.display = "block";
+					if (t >= 0.95) {
+						phoneEl.classList.add("visible");
+					} else {
+						phoneEl.classList.remove("visible");
+					}
+				}
+			}
+
+			// 初始化
+			updatePP();
+			updatePhone();
+
+			// ===== 区段2 聊天动画逻辑 =====
+			const aboutSection = document.getElementById("about");
+			const chatBox = document.getElementById("chat-box");
+			const typingIndicator = document.getElementById("typing-indicator");
+
+			// 监听子元素（row）动画，将当前正在发送的消息滚动到视口中
+			if (chatBox) {
+				const rows = chatBox.querySelectorAll(".chat-row");
+				rows.forEach((row) => {
+					// 动画开始时，将当前 row 滚动到可见区域
+					row.addEventListener("animationstart", () => {
+						setTimeout(() => {
+							(row as HTMLElement).scrollIntoView({
+								behavior: "smooth",
+								block: "nearest",
+							});
+						}, 10);
+					});
+				});
+			}
+
+			// 使用 IntersectionObserver 监听 "关于我" 区段是否进入视口
+			const observerOptions = {
+				root: scrollContainer, // 在 body 滚动
+				threshold: 0.5, // 当 50% 的区域进入视口时触发
+			};
+
+			let animationHasRun = false;
+			let typingHideTimeout: any;
+
+			const aboutObserver = new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					// 当滚动到该区域，且动画需要被重置/触发
+					if (entry.isIntersecting) {
+						if (typingHideTimeout) clearTimeout(typingHideTimeout);
+
+						// 每次进入都重新播放动画
+						chatBox?.classList.remove("active");
+
+						// 重置为正在输入状态
+						if (typingIndicator) {
+							typingIndicator.innerHTML =
+								'对方正在输入<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
+							typingIndicator.classList.remove("hidden");
+						}
+
+						// 1. 每次重新触发时，先滚动到顶端
+						if (chatBox) chatBox.scrollTop = 0;
+
+						// 2. 强制重绘，确保动画可以重新触发
+						void chatBox?.offsetWidth;
+
+						chatBox?.classList.add("active");
+
+						// 对方正在输入消失的时间：等最后一条消息发送完毕后替换为名字
+						typingHideTimeout = setTimeout(() => {
+							if (typingIndicator) {
+								typingIndicator.innerHTML = "张润芃PP";
+							}
+						}, 14000);
+					} else {
+						// 离开视口时重置
+						chatBox?.classList.remove("active");
+						if (typingIndicator) {
+							typingIndicator.innerHTML =
+								'对方正在输入<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
+							typingIndicator.classList.remove("hidden");
+						}
+						if (chatBox) chatBox.scrollTop = 0;
+						if (typingHideTimeout) clearTimeout(typingHideTimeout);
+					}
+				});
+			}, observerOptions);
+
+			if (aboutSection) {
+				aboutObserver.observe(aboutSection);
+			}
+
+			// 脚下光可见性控制
+			const portfolioSection = document.getElementById("portfolio");
+			let glowVisible = false;
+			let glowShowTimeout: any = null;
+			let portfolioFirstPlay = false; // 标记视频是否已在区段3首次播放
+
+			function setGlowVisible(visible: boolean) {
+				glowVisible = visible;
+				const allGlows = document.querySelectorAll(".animal-glow");
+				allGlows.forEach((el) => {
+					(el as HTMLElement).style.visibility = visible
+						? "visible"
+						: "hidden";
+				});
+			}
+
+			function updateGlowVisibility() {
+				const scrollTop = scrollContainer.scrollTop;
+				const vh = window.innerHeight;
+				// 作品集是第3个区段 (index=2)，scrollTop 接近 2*vh 时可见
+				const portfolioStart = 2 * vh;
+				const isInPortfolio =
+					scrollTop >= portfolioStart - vh * 0.3 &&
+					scrollTop <= portfolioStart + vh * 0.3;
+
+				if (isInPortfolio && !glowVisible) {
+					// 进入作品集：延迟1秒后显示
+					if (!glowShowTimeout) {
+						glowShowTimeout = setTimeout(() => {
+							setGlowVisible(true);
+							glowShowTimeout = null;
+						}, 500);
+					}
+					// 首次进入区段3时播放视频
+					if (!portfolioFirstPlay) {
+						portfolioFirstPlay = true;
+						const vid = document.getElementById(
+							"portfolio-vid"
+						) as HTMLVideoElement;
+						if (vid && vid.src) {
+							vid.currentTime = 0;
+							vid.play().catch(() => {
+								vid.muted = true;
+								vid.play();
+							});
+						}
+					}
+				} else if (!isInPortfolio) {
+					// 离开作品集：立即隐藏，并取消未执行的延迟
+					if (glowShowTimeout) {
+						clearTimeout(glowShowTimeout);
+						glowShowTimeout = null;
+					}
+					if (glowVisible) {
+						setGlowVisible(false);
+					}
+					// 离开区段3时暂停视频，下次回来重新播放
+					if (portfolioFirstPlay) {
+						portfolioFirstPlay = false;
+						const vid = document.getElementById(
+							"portfolio-vid"
+						) as HTMLVideoElement;
+						if (vid) {
+							vid.pause();
+							vid.currentTime = 0;
+						}
+					}
+				}
+			}
+
+			// 监听滚动 (PP动画 + 手机动画 + 脚下光)
+			scrollContainer.addEventListener(
+				"scroll",
+				() => {
+					requestAnimationFrame(() => {
+						updatePP();
+						updatePhone();
+						updateGlowVisibility();
+					});
+				},
+				{ passive: true }
+			);
+
+			// 监听窗口大小变化
+			window.addEventListener("resize", () => {
+				updatePP();
+				updatePhone();
+			});
+
+			// 初始化脚下光可见性（默认隐藏，因为首页不在作品集区段）
+			updateGlowVisibility();
+
+			// ===== 区段3：作品集交互逻辑 =====
+			const animalBtns = document.querySelectorAll(".animal-btn");
+			const portfolioImg = document.getElementById(
+				"portfolio-img"
+			) as HTMLImageElement;
+			const portfolioVid = document.getElementById(
+				"portfolio-vid"
+			) as HTMLVideoElement;
+			const portfolioTitle = document.getElementById(
+				"portfolio-title"
+			) as HTMLElement;
+			const portfolioDesc = document.getElementById(
+				"portfolio-desc"
+			) as HTMLElement;
+			const portfolioDisplay = document.getElementById(
+				"portfolio-display"
+			) as HTMLElement;
+
+			// 模拟的作品集数据 (支持图片或视频)
+			const portfolioData = [
+				{
+					title: "创意策划：《9102新闻独播》",
+					desc: `<div style="margin-bottom:8px;"><span class="skill-tag tag-red">团队统筹</span><span class="skill-tag tag-yellow">沉浸式叙事</span><span class="skill-tag tag-green">全链路执行</span></div>
+<em>"如果念 PPT 的宣讲是无聊的定式，那就重构一个时空。"</em>
+<br/><br/>
+<strong>我是如何"造梦"的：</strong><br/>
+我用《新闻联播》片头开启 9102 年倒计时。在"高温 80℃、主席访问土星"的荒诞设定下，我将环保数据揉碎成"最后一只哈士奇的葬礼"的脚本。当熟悉的视听遇上末世叙事，观众瞬间进入了我构建的未来。
+<br/><br/>
+<strong>作为"排演者"的视角：</strong><br/>
+在这场 40 人的项目中，我让每个性格不同的伙伴都找到了光芒：心思缜密、性格内向的同学在幕后打磨道具；表达欲旺盛的伙伴各司其职，演活"未来记者"。我既是控场主播，也是伏地做道具的执行者。这种全环节介入让我明白：最好的统筹，是让每个人在最舒服的位置成全一场梦。
+<br/><br/>
+<a href="https://mp.weixin.qq.com/s/BhEhcpeIFMPTe8JfCwKsbA" target="_blank" rel="noopener" style="color:#f9c007;text-decoration:underline;">📖 查看公众号原文</a>`,
+					type: "video",
+					src: "/images/作品1.webm",
+				},
+				{
+					title: "跨越屏幕的告别：《Happiness》视觉叙事",
+					desc: `<div style="margin-bottom:8px;"><span class="skill-tag tag-red">内容洞察</span><span class="skill-tag tag-yellow">情感共鸣策划</span><span class="skill-tag tag-green">视听蒙太奇</span></div>
+<em>"在物理隔离的时代，用影像重连情感。"</em>
+<br/><br/>
+<strong>背景：</strong><br/>
+那是疫情期间给班主任的最后一次英语演讲。隔着屏幕，我想给这段师生缘分画一个有仪式感的句号。
+<br/><br/>
+<strong>创意点：</strong><br/>
+灵感来自漫画书《Happiness》。我发现书中那些虚构的幸福，在组员们琐碎的生活里都有对应。我收集了大家的幸福瞬间，配上每个人读诗的声音，把现实和漫画重叠在一起。我独自剪辑了这段视频，没有高大上的特效，只有治愈的轻音乐和最真诚的独白。
+<br/><br/>
+<strong>最动人的瞬间：</strong><br/>
+视频播完，屏幕那头的老师流泪了。这让我笃信：内容策划真正的穿透力，不在于技术多复杂，而在于你捕捉到了多少真心。`,
+					type: "video",
+					src: "/images/作品2.webm",
+				},
+				{
+					title: "听得见的环保：MV《Utopia 2100》",
+					desc: `<div style="margin-bottom:8px;"><span class="skill-tag tag-red">全能音乐策划</span><span class="skill-tag tag-yellow">通感表达</span><span class="skill-tag tag-green">创意落地</span></div>
+<em>"把深刻的议题，藏进每一帧旋律与音轨里。"</em>
+<br/><br/>
+<strong>初衷：</strong><br/>
+谁说科普只能看文字？作为一个敲了 14 年打击乐的人，我更想让环保"动听"起来。我为既有画面定制了整套听觉系统，探索环保议题的感性传播路径。
+<br/><br/>
+<strong>我是怎么做的：</strong><br/>
+我深度参与编曲构思（GarageBand），独立完成全曲 Vocal 录制，通过声音的力度与音色赋予画面叙事灵魂。
+<br/><br/>
+<strong>成果：</strong><br/>
+最终产出的 MV 证明了我既能天马行空地想，也能脚踏实地把旋律和画面一帧帧磨出来。`,
+					type: "video",
+					src: "/images/作品3.webm",
+				},
+				{
+					title: '跨越文化的纽带：学院IP"熊猫与黑脸羊"',
+					desc: `<div style="margin-bottom:8px;"><span class="skill-tag tag-red">IP孵化</span><span class="skill-tag tag-yellow">视觉策略</span><span class="skill-tag tag-green">社群运营</span></div>
+<em>"不仅是画一个吉祥物，更是构筑一种社群归属感。"</em>
+<br/><br/>
+在中外合作办学的跨文化环境下，我们需要一个视觉符号作为情感连接的锚点。
+<br/><br/>
+<strong>孵化过程：</strong><br/>
+我策划并孵化了学院IP：代表中国的熊猫和代表爱尔兰的黑脸羊。它们不是高高在上的图腾，而是出现在展板、海报和各种物料里的"亲善大使"。
+<br/><br/>
+<strong>意外的惊喜：</strong><br/>
+本以为这只是一个阶段性的任务，没想到直到我毕业后，它们依然是学院各处宣传里的"传家宝"。它留下的不仅是设计，更是一种文化认同的积淀。`,
+					type: "video",
+					src: "/images/作品4.webm",
+					muted: true,
+				},
+			];
+
+			// 更新中央展示区的内容
+			function updatePortfolioContent(index: number) {
+				const data = portfolioData[index];
+
+				// 淡出动画效果
+				portfolioDisplay.style.opacity = "0";
+
+				setTimeout(() => {
+					// 更新文字
+					portfolioTitle.innerText = data.title;
+					portfolioDesc.innerHTML = data.desc;
+
+					// 更新媒体
+					if (data.type === "video") {
+						portfolioImg.style.display = "none";
+						portfolioVid.style.display = "block";
+						portfolioVid.src = data.src;
+						portfolioVid.loop = true;
+						portfolioVid.muted = data.muted || false;
+						portfolioVid.volume = data.muted ? 0 : 0.5;
+						portfolioVid.play().catch(() => {
+							// 浏览器可能阻止有声自动播放，先静音播放再提示用户点击取消静音
+							portfolioVid.muted = true;
+							portfolioVid.play();
+						});
+					} else {
+						portfolioVid.style.display = "none";
+						// 暂停视频播放
+						portfolioVid.pause();
+						portfolioImg.style.display = "block";
+						portfolioImg.src = data.src;
+					}
+
+					// 淡入
+					portfolioDisplay.style.opacity = "1";
+				}, 300); // 对应 CSS 中 0.3s 的 transition
+			}
+
+			// 初始化作品集内容（只设置文字和视频源，不自动播放）
+			function initPortfolioContent(index: number) {
+				const data = portfolioData[index];
+				portfolioTitle.innerText = data.title;
+				portfolioDesc.innerHTML = data.desc;
+				if (data.type === "video") {
+					portfolioImg.style.display = "none";
+					portfolioVid.style.display = "block";
+					portfolioVid.src = data.src;
+					portfolioVid.loop = true;
+					portfolioVid.muted = data.muted || false;
+					portfolioVid.volume = data.muted ? 0 : 0.5;
+					// 不调用 play()，等滚动到区段3时再播放
+				} else {
+					portfolioVid.style.display = "none";
+					portfolioImg.style.display = "block";
+					portfolioImg.src = data.src;
+				}
+				portfolioDisplay.style.opacity = "1";
+			}
+
+			// 更新小动物按钮的活跃状态和“点击它”提示
+			// 脚下光元素
+			const glowEls = [
+				document.getElementById("glow-1"),
+				document.getElementById("glow-2"),
+				document.getElementById("glow-3"),
+				document.getElementById("glow-4"),
+			];
+
+			function updateActiveAnimal(activeIndex: number) {
+				animalBtns.forEach((btn, idx) => {
+					btn.classList.remove("active", "hint-active");
+
+					// 设置当前激活的动物
+					if (idx === activeIndex) {
+						btn.classList.add("active");
+					}
+
+					// 设置提示的动物（上一个，反向引导：4→3→2→1）
+					const nextIndex =
+						(activeIndex - 1 + animalBtns.length) %
+						animalBtns.length;
+					if (idx === nextIndex) {
+						btn.classList.add("hint-active");
+					}
+				});
+
+				// 更新脚下光显隐
+				glowEls.forEach((el, idx) => {
+					if (!el) return;
+					if (idx === activeIndex) {
+						el.classList.add("active");
+					} else {
+						el.classList.remove("active");
+					}
+				});
+			}
+
+			// 绑定点击事件
+			animalBtns.forEach((btn) => {
+				btn.addEventListener("click", () => {
+					const index = parseInt(
+						btn.getAttribute("data-index") || "0",
+						10
+					);
+					updateActiveAnimal(index);
+					updatePortfolioContent(index);
+				});
+			});
+
+			// 初始化状态 (默认选中第四个，反向展示，但不自动播放视频)
+			updateActiveAnimal(3);
+			initPortfolioContent(3);
+
+			// ===== 区段4：一键复制功能 =====
+			const copyBtns = document.querySelectorAll(".copy-btn");
+			copyBtns.forEach((btn) => {
+				btn.addEventListener("click", async () => {
+					const text = btn.getAttribute("data-copy") || "";
+					try {
+						await navigator.clipboard.writeText(text);
+					} catch {
+						// fallback
+						const ta = document.createElement("textarea");
+						ta.value = text;
+						ta.style.position = "fixed";
+						ta.style.opacity = "0";
+						document.body.appendChild(ta);
+						ta.select();
+						document.execCommand("copy");
+						document.body.removeChild(ta);
+					}
+					// 显示"已复制"提示
+					const toast = btn.parentElement?.querySelector(
+						".copy-toast"
+					) as HTMLElement;
+					if (toast) {
+						toast.classList.add("show");
+						setTimeout(() => toast.classList.remove("show"), 1500);
+					}
+				});
+			});
+
+			// ===== BGM 喇叭控制逻辑 =====
+			const bgmAudio = document.getElementById(
+				"bgm-audio"
+			) as HTMLAudioElement;
+			const bgmBtn = document.getElementById("bgm-toggle") as HTMLElement;
+			let bgmUserEnabled = false; // 用户是否手动开启了BGM
+
+			// 点击切换BGM
+			bgmBtn.addEventListener("click", () => {
+				if (bgmUserEnabled) {
+					// 关闭
+					bgmUserEnabled = false;
+					bgmAudio.pause();
+					bgmBtn.innerHTML =
+						'<svg viewBox="0 0 24 24" fill="none" stroke="#f4e6b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+					bgmBtn.classList.remove("playing");
+				} else {
+					// 开启
+					bgmUserEnabled = true;
+					bgmBtn.innerHTML =
+						'<svg viewBox="0 0 24 24" fill="none" stroke="#f4e6b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+					bgmBtn.classList.add("playing");
+					// 检查是否有视频在播放，没有才播放
+					if (!isAnyVideoPlaying()) {
+						bgmAudio.play().catch(() => {});
+					}
+				}
+			});
+
+			// 检测是否有非静音视频正在播放
+			function isAnyVideoPlaying(): boolean {
+				const videos = document.querySelectorAll("video");
+				for (const v of videos) {
+					if (!v.paused && !v.muted && v.volume > 0) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			// 轮询检测视频播放状态，控制BGM暂停/恢复
+			setInterval(() => {
+				if (!bgmUserEnabled) return;
+				if (isAnyVideoPlaying()) {
+					// 有视频在播，暂停BGM
+					if (!bgmAudio.paused) {
+						bgmAudio.pause();
+					}
+				} else {
+					// 没有视频在播，恢复BGM
+					if (bgmAudio.paused) {
+						bgmAudio.play().catch(() => {});
+					}
+				}
+			}, 500);
+		</script>
+	</body>
+</html>
