@@ -475,6 +475,50 @@
 				animation-delay: 14s;
 			}
 
+			/* ========== 向下滚动提示 ========== */
+			.scroll-hint {
+				position: absolute;
+				bottom: 56px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 40;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 4px;
+				opacity: 0;
+				animation: scrollHintFadeIn 1.5s 1s forwards;
+				transition: opacity 0.5s ease;
+				pointer-events: none;
+			}
+			.scroll-hint.hidden {
+				opacity: 0 !important;
+			}
+			.scroll-hint-arrow {
+				font-size: 1.4rem;
+				color: #f4e6b3;
+				animation: scrollBounce 1.8s ease-in-out infinite;
+			}
+			.scroll-hint-text {
+				font-size: 0.75rem;
+				color: rgba(244, 230, 179, 0.7);
+				letter-spacing: 2px;
+			}
+			@keyframes scrollHintFadeIn {
+				to {
+					opacity: 1;
+				}
+			}
+			@keyframes scrollBounce {
+				0%,
+				100% {
+					transform: translateY(0);
+				}
+				50% {
+					transform: translateY(8px);
+				}
+			}
+
 			/* ========== 区段3 作品集相关样式 ========== */
 			.portfolio-container {
 				width: 80%;
@@ -1089,6 +1133,12 @@
 					<img src="/images/主页标题.webp" alt="主页标题" />
 				</div>
 			</div>
+
+			<!-- 向下滚动提示 -->
+			<div class="scroll-hint" id="scroll-hint">
+				<div class="scroll-hint-text">向下滚动</div>
+				<div class="scroll-hint-arrow">↓</div>
+			</div>
 		</section>
 
 		<!-- 手机动画（fixed，JS 控制位置和大小） -->
@@ -1468,6 +1518,17 @@
 			updatePP();
 			updatePhone();
 
+			// ===== 向下滚动提示：滚动后隐藏 =====
+			const scrollHint = document.getElementById("scroll-hint");
+			function updateScrollHint() {
+				if (!scrollHint) return;
+				if (scrollContainer.scrollTop > 100) {
+					scrollHint.classList.add("hidden");
+				} else {
+					scrollHint.classList.remove("hidden");
+				}
+			}
+
 			// ===== 区段2 聊天动画逻辑 =====
 			const aboutSection = document.getElementById("about");
 			const chatBox = document.getElementById("chat-box");
@@ -1624,6 +1685,7 @@
 						updatePP();
 						updatePhone();
 						updateGlowVisibility();
+						updateScrollHint();
 					});
 				},
 				{ passive: true }
