@@ -721,7 +721,7 @@
 				color: #f0f0f0;
 			}
 			.portfolio-text p {
-				font-size: 0.85rem;
+				font-size: 0.95rem;
 				line-height: 1.6;
 			}
 
@@ -730,7 +730,7 @@
 				display: inline-block;
 				padding: 3px 10px;
 				border-radius: 20px;
-				font-size: 0.72rem;
+				font-size: 0.82rem;
 				font-weight: 600;
 				margin: 2px 3px;
 				letter-spacing: 0.03em;
@@ -1075,6 +1075,368 @@
 				100% {
 					opacity: 0;
 					transform: translateY(0) rotate(0deg);
+				}
+			}
+
+			/* ==========================================
+			   响应式适配：平板 (≤1024px)
+			   ========================================== */
+			@media (max-width: 1024px) {
+				:root {
+					/* 缩小小动物 */
+					--animal1-width: 160px;
+					--animal1-height: 160px;
+					--animal2-width: 145px;
+					--animal2-height: 145px;
+					--animal3-width: 170px;
+					--animal3-height: 170px;
+					--animal4-width: 240px;
+					--animal4-height: 240px;
+					--animals-nav-x-offset: -20px;
+					--animals-nav-y-offset: -40px;
+					--animal4-y-offset: 25px;
+					--animal4-hint-y-offset: 20px;
+				}
+
+				.section-content {
+					padding: 2.5rem;
+				}
+				.section-content h2 {
+					font-size: 2rem;
+				}
+
+				/* 区段3：作品集改为上下布局 */
+				.portfolio-container {
+					width: 90%;
+					padding-top: 15vh;
+				}
+				.portfolio-content-split {
+					flex-direction: column;
+					padding: 24px;
+					gap: 24px;
+					min-height: auto;
+				}
+				.portfolio-media {
+					min-height: 220px;
+					padding: 12px;
+				}
+				.portfolio-media img,
+				.portfolio-media video {
+					max-height: 280px;
+				}
+				.portfolio-text {
+					max-height: none;
+				}
+				.portfolio-text h3 {
+					font-size: 1.2rem;
+				}
+				.portfolio-text p {
+					font-size: 0.88rem;
+				}
+
+				/* 区段4 */
+				.contact-title {
+					font-size: 2rem;
+				}
+				.contact-intro {
+					font-size: 0.95rem;
+				}
+
+				/* BGM 按钮 */
+				.bgm-toggle {
+					width: 50px;
+					height: 50px;
+					right: 40px;
+					bottom: 30px;
+				}
+				.bgm-toggle svg {
+					width: 36px;
+					height: 36px;
+				}
+			}
+
+			/* ==========================================
+			   响应式适配：手机横屏 (≤768px)
+			   ========================================== */
+			@media (max-width: 768px) {
+				:root {
+					--animal1-width: 110px;
+					--animal1-height: 110px;
+					--animal2-width: 100px;
+					--animal2-height: 100px;
+					--animal3-width: 120px;
+					--animal3-height: 120px;
+					--animal4-width: 170px;
+					--animal4-height: 170px;
+					--animals-nav-x-offset: -15px;
+					--animals-nav-y-offset: -25px;
+					--animal3-y-offset: 5px;
+					--animal4-x-offset: -15px;
+					--animal4-y-offset: 18px;
+					--animal4-hint-y-offset: 15px;
+
+					--phone-end-width: 35%;
+					--phone-end-left: 50%;
+					--typing-text-size: 2vw;
+				}
+
+				.section-content {
+					padding: 1.5rem;
+				}
+				.section-content h2 {
+					font-size: 1.6rem;
+				}
+				.section-content p {
+					font-size: 0.95rem;
+				}
+				.section-content .content-card {
+					padding: 2rem 2.5rem;
+				}
+
+				/* 区段3 */
+				.portfolio-container {
+					width: 92%;
+					padding-top: 12vh;
+				}
+				.portfolio-content-split {
+					padding: 18px;
+					gap: 18px;
+				}
+				.portfolio-media {
+					min-height: 180px;
+					padding: 10px;
+				}
+				.portfolio-media img,
+				.portfolio-media video {
+					max-height: 220px;
+				}
+				.portfolio-text h3 {
+					font-size: 1.1rem;
+					margin-bottom: 8px;
+				}
+				.portfolio-text p {
+					font-size: 0.82rem;
+					line-height: 1.5;
+				}
+				.skill-tag {
+					font-size: 0.7rem;
+					padding: 2px 8px;
+				}
+
+				/* 点击提示 */
+				.click-hint {
+					font-size: 0.7rem;
+				}
+
+				/* 区段4 */
+				.contact-title {
+					font-size: 1.7rem;
+				}
+				.contact-intro {
+					font-size: 0.9rem;
+					line-height: 1.7;
+				}
+				.contact-cards {
+					gap: 16px;
+				}
+				.contact-item {
+					min-width: 180px;
+					padding: 1.2rem 1.5rem;
+				}
+				.download-btn {
+					padding: 12px 24px;
+					font-size: 0.9rem;
+				}
+
+				/* BGM */
+				.bgm-toggle {
+					width: 44px;
+					height: 44px;
+					right: 20px;
+					bottom: 20px;
+				}
+				.bgm-toggle svg {
+					width: 30px;
+					height: 30px;
+				}
+
+				/* 滚动提示 */
+				.scroll-hint {
+					bottom: 36px;
+				}
+				.scroll-hint-arrow {
+					font-size: 1.1rem;
+				}
+				.scroll-hint-text {
+					font-size: 0.65rem;
+				}
+			}
+
+			/* ==========================================
+			   响应式适配：手机竖屏 (≤480px)
+			   ========================================== */
+			@media (max-width: 480px) {
+				:root {
+					--animal1-width: 70px;
+					--animal1-height: 70px;
+					--animal1-hint-x-offset: -10px;
+					--animal2-width: 65px;
+					--animal2-height: 65px;
+					--animal3-width: 75px;
+					--animal3-height: 75px;
+					--animal3-y-offset: 3px;
+					--animal3-hint-y-offset: -10px;
+					--animal3-hint-x-offset: -8px;
+					--animal4-width: 110px;
+					--animal4-height: 110px;
+					--animal4-x-offset: -10px;
+					--animal4-y-offset: 12px;
+					--animal4-hint-y-offset: 10px;
+					--animals-nav-x-offset: -8px;
+					--animals-nav-y-offset: -15px;
+					--animal-spacing: -5px;
+
+					--phone-end-width: 55%;
+					--phone-end-left: 50%;
+					--typing-text-size: 3vw;
+				}
+
+				.section-content {
+					padding: 1rem;
+				}
+				.section-content h2 {
+					font-size: 1.3rem;
+					margin-bottom: 1rem;
+				}
+				.section-content p {
+					font-size: 0.85rem;
+					line-height: 1.6;
+				}
+				.section-content .content-card {
+					padding: 1.5rem 1.5rem;
+					border-radius: 16px;
+				}
+
+				/* 区段3 */
+				.portfolio-container {
+					width: 95%;
+					padding-top: 8vh;
+				}
+				.portfolio-content-split {
+					padding: 14px;
+					gap: 14px;
+					border-radius: 14px;
+				}
+				.portfolio-media {
+					min-height: 140px;
+					padding: 8px;
+					border-radius: 8px;
+				}
+				.portfolio-media img,
+				.portfolio-media video {
+					max-height: 170px;
+					border-radius: 6px;
+				}
+				.portfolio-text h3 {
+					font-size: 0.95rem;
+					margin-bottom: 6px;
+				}
+				.portfolio-text p {
+					font-size: 0.75rem;
+					line-height: 1.45;
+				}
+				.skill-tag {
+					font-size: 0.6rem;
+					padding: 2px 6px;
+					margin: 1px 2px;
+				}
+
+				/* 点击提示 */
+				.click-hint {
+					font-size: 0.6rem;
+					top: -20px;
+				}
+
+				/* 区段4 */
+				.contact-content {
+					padding: 2rem 1rem;
+					gap: 1rem;
+				}
+				.contact-title {
+					font-size: 1.3rem;
+				}
+				.contact-intro {
+					font-size: 0.8rem;
+					line-height: 1.6;
+				}
+				.contact-cards {
+					flex-direction: column;
+					gap: 12px;
+					width: 100%;
+				}
+				.contact-item {
+					min-width: unset;
+					width: 100%;
+					padding: 1rem 1.2rem;
+					border-radius: 12px;
+				}
+				.contact-icon {
+					font-size: 1.5rem;
+					margin-bottom: 4px;
+				}
+				.contact-label {
+					font-size: 0.75rem;
+				}
+				.contact-value {
+					font-size: 0.85rem;
+					margin-bottom: 8px;
+				}
+				.copy-btn {
+					padding: 5px 12px;
+					font-size: 0.78rem;
+				}
+				.download-btn {
+					padding: 10px 20px;
+					font-size: 0.85rem;
+					border-radius: 10px;
+				}
+				.footer-credit {
+					font-size: 0.75rem;
+				}
+				.footer-thanks {
+					font-size: 0.8rem;
+				}
+
+				/* BGM */
+				.bgm-toggle {
+					width: 38px;
+					height: 38px;
+					right: 12px;
+					bottom: 12px;
+					border-radius: 8px;
+				}
+				.bgm-toggle svg {
+					width: 24px;
+					height: 24px;
+				}
+
+				/* 滚动提示 */
+				.scroll-hint {
+					bottom: 28px;
+				}
+				.scroll-hint-arrow {
+					font-size: 1rem;
+				}
+				.scroll-hint-text {
+					font-size: 0.6rem;
+				}
+
+				/* 装饰元素缩小 */
+				.deco-note {
+					font-size: 1rem;
+				}
+				.deco-star {
+					font-size: 0.7rem;
 				}
 			}
 		</style>
