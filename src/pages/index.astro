@@ -12,11 +12,11 @@
 		<style is:global>
 			:root {
 				/* 统一控制所有图片的展示尺寸 —— 修改这里即可一起调整 */
-				--img-width: 100vw;
-				--img-height: 100vh;
+				--img-width: 100%; /* 从 100vw 改为 100% 以适应父容器 */
+				--img-height: 100%; /* 从 100vh 改为 100% 以适应父容器 */
 
 				/* hero 视频尺寸和位置 */
-				--video-width: 40vw;
+				--video-width: 40%; /* 从 40vw 改为 40% 随背景容器缩放 */
 				--video-top: 50%;
 				--video-left: 52%;
 
@@ -152,9 +152,18 @@
 
 			/* ========== 首页区段内容 ========== */
 			.home-content {
-				position: relative;
-				width: 100%;
-				height: 100%;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				width: 100vw;
+				height: calc(100vw * 900 / 1600);
+			}
+			@media (max-aspect-ratio: 1600/900) {
+				.home-content {
+					width: calc(100vh * 1600 / 900);
+					height: 100vh;
+				}
 			}
 
 			.layer {
@@ -218,9 +227,25 @@
 				flex-direction: column;
 				align-items: center;
 				justify-content: center;
-				height: 100%;
+				/* 不再让内容强行超出一屏（100vh）而跑到下一个区域去 */
+				width: 100%;
+				height: 100vh;
+				max-height: 100vh;
+				overflow-y: auto;
 				padding: 4rem;
 				color: #fff;
+			}
+			/* 隐藏默认滚动条，自定义细滚动条（解决因防溢出而出现的滚动条丑的问题） */
+			.section-content::-webkit-scrollbar {
+				width: 4px;
+				height: 4px;
+			}
+			.section-content::-webkit-scrollbar-track {
+				background: transparent;
+			}
+			.section-content::-webkit-scrollbar-thumb {
+				background: rgba(255, 255, 255, 0.2);
+				border-radius: 4px;
 			}
 
 			.section-content .content-card {
@@ -335,6 +360,7 @@
 				left: 8%;
 				right: 8%;
 				bottom: 10%; /* 留出底部空间 */
+				max-height: 60vh; /* 防止非常狭窄或偏平的屏幕下聊天内容超出可视区域 */
 				overflow-y: auto;
 				overflow-x: hidden;
 				display: flex;
@@ -528,7 +554,10 @@
 				flex-direction: column;
 				gap: 0px;
 				align-items: center;
-				padding-top: 20vh;
+				/* 将定死的很大 padding 改为灵活占比并设置最低限度 */
+				padding-top: max(60px, 12vh);
+				max-height: 100vh;
+				overflow-y: auto;
 			}
 
 			/* 顶部的小动物导航排 */
@@ -1437,6 +1466,79 @@
 				}
 				.deco-star {
 					font-size: 0.7rem;
+				}
+			}
+
+			/* ==========================================
+			   防重叠兜底：矮屏幕适配 (高度 ≤ 700px)
+			   当用户把窗口强行压扁时，通过极致压缩外边距并切换布局，防止内容把高度撑爆。
+			   ========================================== */
+			@media (max-height: 700px) {
+				.section-content {
+					padding: 1rem 2rem;
+				}
+				.section-content h2 {
+					margin-bottom: 0.8rem;
+					font-size: 1.8rem;
+				}
+				.section-content p {
+					font-size: 0.95rem;
+					line-height: 1.4;
+				}
+				.section-content .content-card {
+					padding: 1.5rem 2rem;
+				}
+
+				/* 强制作品集在矮屏下改为上下布局（不再左右分栏），防止被挤爆 */
+				.portfolio-container {
+					padding-top: max(40px, 8vh);
+				}
+				.portfolio-content-split {
+					flex-direction: column;
+					padding: 12px;
+					gap: 12px;
+					min-height: auto;
+				}
+				.portfolio-media {
+					min-height: 120px;
+					padding: 8px;
+				}
+				.portfolio-media img,
+				.portfolio-media video {
+					max-height: 160px;
+				}
+				.portfolio-text h3 {
+					font-size: 1rem;
+					margin-bottom: 4px;
+				}
+				.portfolio-text p {
+					font-size: 0.8rem;
+				}
+				.animals-nav {
+					transform: scale(0.8);
+					transform-origin: bottom center;
+				}
+
+				/* 联系我卡片 */
+				.contact-content {
+					padding: 1rem;
+					gap: 1rem;
+				}
+				.contact-title {
+					font-size: 1.6rem;
+				}
+				.contact-cards {
+					gap: 12px;
+				}
+				.contact-item {
+					padding: 1rem 1.5rem;
+				}
+				.contact-icon {
+					font-size: 1.4rem;
+					margin-bottom: 2px;
+				}
+				.contact-value {
+					margin-bottom: 6px;
 				}
 			}
 		</style>
