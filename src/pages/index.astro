@@ -754,7 +754,24 @@
 				line-height: 1.6;
 			}
 
-			/* 彩色能力标签 */
+			.portfolio-placeholder {
+                width: 100%;
+                min-height: 260px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+                color: rgba(255, 255, 255, 0.75);
+                text-align: center;
+                border: 1px dashed rgba(255, 255, 255, 0.25);
+                border-radius: 8px;
+                padding: 24px;
+            }
+            .portfolio-placeholder[hidden] { display: none; }
+            .portfolio-placeholder small { opacity: 0.7; }
+
+            /* 彩色能力标签 */
 			.skill-tag {
 				display: inline-block;
 				padding: 3px 10px;
@@ -1633,7 +1650,7 @@
 					<div class="chat-bubble bubble-left">
 						这是我的基本情况，请您查收~<br /><br />
 						<b>艺术、企业与发展 硕士[在读]</b>
-						<br />英国华威大学[QS69]<br /><br />
+						<br />英国华威大学[QS68]<br /><br />
 						<b>金融学 双学士</b>
 						<br />北京工业大学[211]<br />
 						爱尔兰都柏林大学[交换]
@@ -1704,7 +1721,11 @@
 				<div class="portfolio-content-split" id="portfolio-display">
 					<!-- 左侧媒体 (图片/视频) -->
 					<div class="portfolio-media" id="portfolio-media-container">
-						<img
+						<div id="portfolio-placeholder" class="portfolio-placeholder" hidden>
+                            <span>展览影像 · 即将更新</span>
+                            <small>Take Water, Take a Breath</small>
+                        </div>
+                        <img
 							id="portfolio-img"
 							src=""
 							alt="作品预览"
@@ -2182,22 +2203,26 @@
 				"portfolio-display"
 			) as HTMLElement;
 
-			// 模拟的作品集数据 (支持图片或视频)
+			const portfolioPlaceholder = document.getElementById("portfolio-placeholder") as HTMLElement;
+
+            // 作品集数据（视频地址留空时显示占位内容）
 			const portfolioData = [
 				{
-					title: "创意策划：《9102新闻独播》",
-					desc: `<div style="margin-bottom:8px;"><span class="skill-tag tag-red">团队统筹</span><span class="skill-tag tag-yellow">沉浸式叙事</span><span class="skill-tag tag-green">全链路执行</span></div>
-<em>"如果念 PPT 的宣讲是无聊的定式，那就重构一个时空。"</em>
+					title: "沉浸式展览：Take Water, Take a Breath",
+					desc: `<div style="margin-bottom:8px;"><span class="skill-tag tag-red">观众体验设计</span><span class="skill-tag tag-yellow">预算与采购统筹</span><span class="skill-tag tag-green">现场执行</span></div>
+<em>“从一条手环开始，邀请观众慢下来，听见自己的情绪。”</em>
 <br/><br/>
-<strong>我是如何"造梦"的：</strong><br/>
-我用《新闻联播》片头开启 9102 年倒计时。在"高温 80℃、主席访问土星"的荒诞设定下，我将环保数据揉碎成"最后一只哈士奇的葬礼"的脚本。当熟悉的视听遇上末世叙事，观众瞬间进入了我构建的未来。
+<strong>把博物馆变成可以停留的地方：</strong><br/>
+硕士期间，我与另外六位伙伴在英国 Leamington Spa Art Gallery &amp; Museum 共同策划并落地了这场为期两天的参与式展览。我们从场馆的温泉历史出发，以“水”为线索，将城市疗愈地图、情绪签到、水声冥想、画作慢赏与共创工作坊串成一段探索情绪的旅程。
 <br/><br/>
-<strong>作为"排演者"的视角：</strong><br/>
-在这场 40 人的项目中，我让每个性格不同的伙伴都找到了光芒：心思缜密、性格内向的同学在幕后打磨道具；表达欲旺盛的伙伴各司其职，演活"未来记者"。我既是控场主播，也是伏地做道具的执行者。这种全环节介入让我明白：最好的统筹，是让每个人在最舒服的位置成全一场梦。
+<strong>我的角色：让体验连起来，让创意落得下。</strong><br/>
+作为财务与入口体验负责人，我设计情绪签到，并提出用手环与挂饰收集串联各个展区，让观众带着参与的期待继续探索。同时，我用共享预算表跟进采购、报销与支出；面对超大展板的运输难题，我与队友现场协调出租车、协商运价，最终将总支出控制在 £739.06，低于 £750 的预算。
 <br/><br/>
-<a href="https://mp.weixin.qq.com/s/BhEhcpeIFMPTe8JfCwKsbA" target="_blank" rel="noopener" style="color:#f9c007;text-decoration:underline;">📖 查看公众号原文</a>`,
+<strong>留下了什么：</strong><br/>
+两天内，200 条参与手环全部发出；团队的疗愈地图收获 229 枚贴纸，水滴留言墙留下 165 条表达。这次实践也让我发现：一个简单的贴纸动作，往往比层层扫码更容易让人参与。设计体验时，我更在意观众能否自然地迈出第一步。`,
 					type: "video",
-					src: "https://videosofzyc.oss-cn-hongkong.aliyuncs.com/PPVideos/%E4%BD%9C%E5%93%811.webm",
+					// 展览视频随网站静态资源一同发布。
+					src: "/take-water-take-a-breath.mp4",
 				},
 				{
 					title: "跨越屏幕的告别：《Happiness》视觉叙事",
@@ -2262,7 +2287,14 @@
 					portfolioDesc.innerHTML = data.desc;
 
 					// 更新媒体
-					if (data.type === "video") {
+					portfolioPlaceholder.hidden = Boolean(data.src);
+                    if (!data.src) {
+                        portfolioImg.style.display = "none";
+                        portfolioVid.style.display = "none";
+                        portfolioVid.pause();
+                        portfolioVid.removeAttribute("src");
+                        portfolioVid.load();
+                    } else if (data.type === "video") {
 						portfolioImg.style.display = "none";
 						portfolioVid.style.display = "block";
 						portfolioVid.src = data.src;
@@ -2292,7 +2324,14 @@
 				const data = portfolioData[index];
 				portfolioTitle.innerText = data.title;
 				portfolioDesc.innerHTML = data.desc;
-				if (data.type === "video") {
+				portfolioPlaceholder.hidden = Boolean(data.src);
+                    if (!data.src) {
+                        portfolioImg.style.display = "none";
+                        portfolioVid.style.display = "none";
+                        portfolioVid.pause();
+                        portfolioVid.removeAttribute("src");
+                        portfolioVid.load();
+                    } else if (data.type === "video") {
 					portfolioImg.style.display = "none";
 					portfolioVid.style.display = "block";
 					portfolioVid.src = data.src;
